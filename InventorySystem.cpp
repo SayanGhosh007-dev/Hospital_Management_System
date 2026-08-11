@@ -6,38 +6,38 @@ using namespace std;
 
 class inventorysystem
 {
-private:
-    int itemId;
-    int quantity;
-    int minimumStock;
-    double price;
-    string itemName;
-    string category;
-    string supplierName;
-    string supplierContact;
-    string batchNumber;
-    string manufacturingDate;
-    string expiryDate;
-    string storageLocation;
+    private:
+        int itemId;
+        int quantity;
+        int minimumStock;
+        double price;
+        string itemName;
+        string category;
+        string supplierName;
+        string supplierContact;
+        string batchNumber;
+        string manufacturingDate;
+        string expiryDate;
+        string storageLocation;
 
-public:
-    inventorysystem();
-    void addItem();
-    void updateItem();
-    void deleteItem();
-    void searchItem();
-    void addStock();
-    void removeStock();
-    void checkStock();
-    void checkLowStock();
-    void checkExpiry();
-    void displayItemDetails();
+    public:
+        inventorysystem();
+        void addItem();
+        void updateItem();
+        void deleteItem();
+        void searchItem();
+        void addStock();
+        void removeStock();
+        void checkStock();
+        void checkLowStock();
+        void checkExpiry();
+        void displayItemDetails();
 };
 
 // Constructor
 inventorysystem::inventorysystem()
 {
-    itemId = 0;
+    itemId = 1;
     itemName = "";
     category = "";
 
