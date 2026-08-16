@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Pharmacy Stock{% endblock %}
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card" style="border-left: 5px solid var(--success-color);">
+        <div class="stat-info">
+            <h3>Active Inventory</h3>
+            <p>{{ inventory.count }} Items</p>
+        </div>
+        <div class="stat-icon">💊</div>
+    </div>
+    <div class="stat-card" style="border-left: 5px solid var(--warning-color);">
+        <div class="stat-info">
+            <h3>Low Stock Warnings</h3>
+            <p>{{ low_stock.count }} Alerts</p>
+        </div>
+        <div class="stat-icon">⚠️</div>
+    </div>
+    <div class="stat-card" style="border-left: 5px solid var(--danger-color);">
+        <div class="stat-info">
+            <h3>Out of Stock</h3>
+            <p>{{ out_of_stock.count }} Items</p>
+        </div>
+        <div class="stat-icon">❌</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Medical Consumables & Medicines Inventory</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Medicine / Consumable Name</th>
+                        <th>Category</th>
+                        <th>Stock Level</th>
+                        <th>Unit Price</th>
+                        <th>Batch / Expiry</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inventory %}
+                    <tr {% if item.is_out_of_stock %}style="background-color: rgba(255, 77, 79, 0.15);"{% elif item.is_low_stock %}style="background-color: rgba(212, 107, 8, 0.15);"{% endif %}>
+                        <td><b>{{ item.item_name }}</b></td>
+                        <td>{{ item.category }}</td>
+                        <td><b>{{ item.quantity }}</b> units</td>
+                        <td>${{ item.price }}</td>
+                        <td>{{ item.batch_number }} / <small>{{ item.expiry_date }}</small></td>
+                        <td>
+                            {% if item.is_out_of_stock %}
+                                <span class="role-badge" style="background-color: #ffccc7; color: #ff4d4f;">Out of Stock</span>
+                            {% elif item.is_low_stock %}
+                                <span class="role-badge" style="background-color: #ffe58f; color: #d46b08;">Low Stock</span>
+                            {% else %}
+                                <span class="role-badge" style="background-color: #d9f7be; color: #389e0d;">In Stock</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'inventory_update' item.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;">Update Stock</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--text-secondary);">No medicine inventory recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Patients Ledger{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>System Patient Directory</h3>
+        {% if user.profile.role == 'Admin' or user.profile.role == 'Receptionist' %}
+        <a href="{% url 'patient_create' %}" class="btn btn-primary">➕ Register Patient</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <!-- Search bar -->
+        <form method="GET" style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <input type="text" name="q" list="patient-names" class="form-control" placeholder="Search patients by name or contact number..." value="{{ q }}">
+            <datalist id="patient-names">
+                {% for name in all_patient_names %}
+                    <option value="{{ name }}"></option>
+                {% endfor %}
+            </datalist>
+            <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">Search</button>
+        </form>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient ID</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Phone</th>
+                        <th>Status / Profile</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in patients %}
+                    <tr>
+                        <td>#{{ p.pk }}</td>
+                        <td><b>{{ p.name }}</b></td>
+                        <td>{{ p.age }}</td>
+                        <td>{{ p.gender }}</td>
+                        <td>{{ p.phone }}</td>
+                        <td>
+                            <a href="{% url 'patient_detail' p.pk %}" class="btn btn-primary" style="padding: 4px 8px; font-size: 0.8rem;">Clinical File</a>
+                            {% if user.profile.role == 'LabStaff' or user.profile.role == 'Doctor' %}
+                            <a href="{% url 'lab_test_create_for_patient' p.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; margin-left: 5px;">Deploy Test Result</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-secondary);">No patients found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

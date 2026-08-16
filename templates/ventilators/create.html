@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Start Ventilation{% endblock %}
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; padding: 30px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: 0 4px 6px var(--shadow-color);">
+    <h3>Allocate Ventilator to Patient</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">Initialize real-time telemetry tracking.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Patient</label>
+            <select name="patient" class="form-control" required>
+                {% for p in patients %}
+                <option value="{{ p.pk }}">{{ p.name }} (Age: {{ p.age }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Available Ventilator Unit</label>
+            <select name="ventilator" class="form-control" required>
+                {% for v in ventilators %}
+                <option value="{{ v.pk }}">{{ v.device_id }} - {{ v.model_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Initial Ventilation Mode</label>
+            <select name="mode" class="form-control" required>
+                <option value="CMV">CMV (Controlled Mechanical Ventilation)</option>
+                <option value="SIMV">SIMV (Synchronized Intermittent Mandatory Ventilation)</option>
+                <option value="CPAP">CPAP (Continuous Positive Airway Pressure)</option>
+            </select>
+        </div>
+
+        <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+            <a href="{% url 'ventilator_sessions' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Start Session</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

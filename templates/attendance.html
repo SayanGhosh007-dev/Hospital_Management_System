@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Punch Attendance{% endblock %}
+{% block content %}
+<div style="display: block;">
+    
+    {% if not is_admin %}
+    <!-- Clock Operations for Staff -->
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div class="card">
+            <div class="card-header">
+                <h3>Attendance Punch Console</h3>
+            </div>
+            <div class="card-body" style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 3.5rem; margin-bottom: 20px; color: var(--primary-color);">⏰</div>
+                
+                {% if current_punch %}
+                    <p style="color: var(--text-secondary); margin-bottom: 10px;">You are currently punched IN since:</p>
+                    <h4 style="margin-bottom: 30px; font-family: monospace; font-size: 1.5rem;">{{ current_punch.punch_in|date:"Y-m-d H:i:s" }}</h4>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="out">
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--danger-color); padding: 12px 40px; font-size: 1.1rem;">Punch OUT Shift</button>
+                    </form>
+                {% else %}
+                    <p style="color: var(--text-secondary); margin-bottom: 30px;">No running shift detected. Clock in to record hours.</p>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="in">
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--success-color); padding: 12px 40px; font-size: 1.1rem;">Punch IN Shift</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if is_admin %}
+    <!-- Attendance History Log for Admin Only -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Hospital Staff Clocking Log History</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Role</th>
+                                <th>Date</th>
+                                <th>In Time</th>
+                                <th>Out Time</th>
+                                <th>Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in records %}
+                            <tr>
+                                <td><b>{{ record.user.first_name|default:record.user.username }}</b></td>
+                                <td><span class="role-badge role-{{ record.user.profile.role|lower }}">{{ record.user.profile.role }}</span></td>
+                                <td>{{ record.punch_in|date:"Y-m-d" }}</td>
+                                <td>{{ record.punch_in|date:"H:i" }}</td>
+                                <td>{{ record.punch_out|date:"H:i"|default:"Active Shift" }}</td>
+                                <td><b>{{ record.working_hours }} hrs</b></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-secondary);">No shift attendance logs recorded system-wide.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

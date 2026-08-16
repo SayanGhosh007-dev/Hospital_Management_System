@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Portal Login{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 80px auto; padding: 40px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: 0 8px 16px var(--shadow-color);">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <span style="font-size: 3rem; color: var(--primary-color);">✚</span>
+        <h2 style="margin-top: 10px;">SafeLife Portal</h2>
+        <p style="color: var(--text-secondary);">Access your workspace</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" class="form-control" placeholder="e.g. doctor, receptionist, pharmacist" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 25px;">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem;">Login</button>
+    </form>
+
+    <div style="margin-top: 25px; text-align: center;">
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            Don't have an account? <a href="{% url 'signup' %}" style="color: var(--primary-color); font-weight: bold;">Sign up here</a>
+        </p>
+    </div>
+
+
+</div>
+{% endblock %}

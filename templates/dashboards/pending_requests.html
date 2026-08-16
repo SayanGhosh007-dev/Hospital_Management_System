@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Pending Staff Registrations{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Pending Staff Verification Requests</h3>
+    </div>
+    <div class="card-body">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Review and approve new hospital staff accounts. Staff cannot log in until their provided ID is verified and approved.</p>
+        
+        <div style="margin-bottom: 20px;">
+            <strong>Filter by Category: </strong>
+            <a href="{% url 'pending_requests' %}" class="btn {% if selected_role == 'All' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 5px 10px; margin-right: 5px;">All</a>
+            {% for role in staff_roles %}
+                <a href="?role={{ role }}" class="btn {% if selected_role == role %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 5px 10px; margin-right: 5px;">{{ role }}</a>
+            {% endfor %}
+        </div>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date Registered</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Provided Staff ID</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in pending %}
+                    <tr>
+                        <td>{{ p.user.date_joined|date:"M d, Y H:i" }}</td>
+                        <td><b>{{ p.user.first_name }} {{ p.user.last_name }}</b></td>
+                        <td>{{ p.user.username }}</td>
+                        <td><span class="badge">{{ p.role }}</span></td>
+                        <td><b style="color: var(--primary-color);">{{ p.staff_id|default:"N/A" }}</b></td>
+                        <td>
+                            <form method="POST" action="{% url 'approve_staff' p.pk %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem; background-color: var(--success-color);">✔️ Approve</button>
+                            </form>
+                            <form method="POST" action="{% url 'reject_staff' p.pk %}" style="display: inline; margin-left: 5px;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem; background-color: var(--danger-color);">❌ Decline</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">
+                            No pending staff registrations to review. All caught up!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

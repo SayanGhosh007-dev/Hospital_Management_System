@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Allocate Room {{ room.room_number }}{% endblock %}
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; padding: 30px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: 0 4px 6px var(--shadow-color);">
+    <h3>Allocate Bed {{ bed.bed_number }}: Room {{ room.room_number }}</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">Room Type: {{ room.room_type }} | Daily Rate: ${{ room.charges }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+        </div>
+        {% endfor %}
+        <div style="margin-top: 25px; display: flex; gap: 15px; justify-content: flex-end;">
+            <a href="{% url 'manage_rooms' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update Allocation</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    form select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+        font-size: 1rem;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}

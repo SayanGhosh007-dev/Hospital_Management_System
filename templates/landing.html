@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 50px auto; padding: 20px; background-color: var(--surface-color); border-radius: var(--border-radius); border: 1px solid var(--border-color); box-shadow: 0 4px 6px var(--shadow-color); text-align: center;">
+    <div style="font-size: 4rem; color: var(--primary-color); margin-bottom: 20px;">✚</div>
+    <h1 style="font-size: 2.5rem; margin-bottom: 10px; color: var(--primary-color);">SafeLife Hospital Management System</h1>
+    <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        A professional, real-time healthcare administration suite featuring clinical diagnostics, triage telemetry, fleet management, and role-based access controls.
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 50px;">
+        <a href="{% url 'login' %}" class="btn btn-primary" style="font-size: 1.1rem; padding: 12px 30px;">Access Portal</a>
+        <a href="{% url 'appointment_book' %}" class="btn btn-secondary" style="font-size: 1.1rem; padding: 12px 30px; background-color: transparent; border: 2px solid var(--primary-color); color: var(--primary-color);">Book Appointment</a>
+    </div>
+
+    <!-- PUBLIC EMERGENCY DISPATCH TRIGGER -->
+    <div style="margin: 0 auto 50px; padding: 30px; border: 2px solid var(--danger-color); border-radius: var(--border-radius); background-color: #fff1f0; max-width: 600px;">
+        <h2 style="color: var(--danger-color); margin-bottom: 10px;">🚨 EMERGENCY DISPATCH (SOS)</h2>
+        <p style="color: #5c0011; margin-bottom: 20px; font-weight: bold;">If you are experiencing a life-threatening medical emergency, use this system to immediately broadcast a Code Blue to all on-shift doctors and dispatch an available ambulance to your location.</p>
+        
+        <form method="POST" action="{% url 'public_emergency' %}">
+            {% csrf_token %}
+            <div style="display: flex; gap: 15px; margin-bottom: 15px; text-align: left;">
+                <div style="flex: 1;">
+                    <label style="color: var(--danger-color); font-weight: bold; margin-bottom: 5px; display: block;">Emergency Type</label>
+                    <select name="specialization" required style="width: 100%; padding: 10px; border: 1px solid var(--danger-color); border-radius: var(--border-radius);">
+                        <option value="General">General Emergency</option>
+                        <option value="Cardiology">Cardiac Arrest / Heart Attack</option>
+                        <option value="Neurology">Stroke / Seizure</option>
+                        <option value="Orthopedics">Severe Trauma / Accident</option>
+                        <option value="Pulmonology">Respiratory Failure</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="color: var(--danger-color); font-weight: bold; margin-bottom: 5px; display: block;">Your Contact #</label>
+                    <input type="text" name="contact" required placeholder="Phone number" style="width: 100%; padding: 10px; border: 1px solid var(--danger-color); border-radius: var(--border-radius);">
+                </div>
+            </div>
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="color: var(--danger-color); font-weight: bold; margin-bottom: 5px; display: block;">Exact Location for Ambulance</label>
+                <input type="text" name="location" required placeholder="Full Address / Landmarks" style="width: 100%; padding: 10px; border: 1px solid var(--danger-color); border-radius: var(--border-radius);">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; background-color: var(--danger-color); font-size: 1.2rem; padding: 15px; font-weight: bold;">DISPATCH AMBULANCE NOW</button>
+        </form>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; text-align: left; margin-top: 50px;">
+        <div style="padding: 20px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+            <h3 style="color: var(--primary-color); margin-bottom: 10px;">🏥 Advanced Wards</h3>
+            <p style="color: var(--text-secondary);">Real-time room occupancy tracker and patient vital monitoring integration.</p>
+        </div>
+        <div style="padding: 20px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+            <h3 style="color: var(--primary-color); margin-bottom: 10px;">🚑 Fleet Radar</h3>
+            <p style="color: var(--text-secondary);">GPS dispatch coordinates and ambulance workload allocation system.</p>
+        </div>
+        <div style="padding: 20px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+            <h3 style="color: var(--primary-color); margin-bottom: 10px;">🫁 Digital Ventilation</h3>
+            <p style="color: var(--text-secondary);">Live ventilator pressure and oxygen flow warning detection system.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

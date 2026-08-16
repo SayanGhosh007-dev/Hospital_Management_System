@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Total Patients</h3>
+            <p>{{ total_patients }}</p>
+        </div>
+        <div class="stat-icon">👥</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Total Doctors</h3>
+            <p>{{ total_doctors }}</p>
+        </div>
+        <div class="stat-icon">👨‍⚕️</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Bed Occupancy</h3>
+            <p>{{ available_beds }} / {{ total_beds }} Beds Available</p>
+        </div>
+        <div class="stat-icon">🛏️</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Today's Revenue</h3>
+            <p>${{ today_revenue }}</p>
+        </div>
+        <div class="stat-icon">💵</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 30px;">
+    <!-- Recent Patients -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Recent Patient Registrations</h3>
+            <a href="{% url 'patient_list' %}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">View All</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in recent_patients %}
+                        <tr>
+                            <td><a href="{% url 'patient_detail' p.pk %}"><b>{{ p.name }}</b></a></td>
+                            <td>{{ p.age }}</td>
+                            <td>{{ p.gender }}</td>
+                            <td>{{ p.phone }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-secondary);">No patients registered yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Quick Operations</h3>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="{% url 'patient_create' %}" class="btn btn-primary">➕ Register Patient</a>
+            <a href="{% url 'billing_create' %}" class="btn btn-secondary">💵 Generate New Invoice</a>
+            <a href="{% url 'trigger_emergency' %}" class="btn btn-primary" style="background-color: var(--danger-color);">🚨 Broadcast Code Blue</a>
+            <a href="{% url 'ambulance_dispatch' %}" class="btn btn-secondary">🚑 Dispatch Ambulance</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

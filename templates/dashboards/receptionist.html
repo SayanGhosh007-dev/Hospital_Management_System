@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Receptionist Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Bed Occupancy</h3>
+            <p>{{ vacant_beds }} / {{ total_beds }} Beds Available</p>
+        </div>
+        <div class="stat-icon">🛏️</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Appointments Today</h3>
+            <p>{{ today_appointments.count }} Bookings</p>
+        </div>
+        <div class="stat-icon">📅</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Ambulances Available</h3>
+            <p>{{ available_ambulances.count }}</p>
+        </div>
+        <div class="stat-icon">🚑</div>
+    </div>
+        <div class="stat-card">
+            <div class="stat-info">
+                <h3>Total Rooms</h3>
+                <p>{{ room_count }}</p>
+            </div>
+            <div class="stat-icon">🏥</div>
+        </div>
+
+    </div>
+
+<!-- Search Panel -->
+<div class="card" style="margin-bottom: 30px;">
+    <div class="card-body">
+        <form method="GET" style="display: flex; gap: 15px;">
+            <input type="text" name="q" list="patient-names" class="form-control" placeholder="Search patients by name, phone or email..." value="{{ request.GET.q }}">
+            <datalist id="patient-names">
+                {% for name in all_patient_names %}
+                    <option value="{{ name }}"></option>
+                {% endfor %}
+            </datalist>
+            <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">Search</button>
+        </form>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+    <!-- Patients List -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Patient Admissions & Status</h3>
+            <a href="{% url 'patient_create' %}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">➕ Register Patient</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Contact</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in patients %}
+                        <tr>
+                            <td>#{{ p.pk }}</td>
+                            <td><b>{{ p.name }}</b></td>
+                            <td>{{ p.age }}</td>
+                            <td>{{ p.phone }}</td>
+                            <td>
+                                <a href="{% url 'patient_detail' p.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;">Profile</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-secondary);">No patients found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Operations -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Operations</h3>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 12px;">
+            <a href="{% url 'appointment_book' %}" class="btn btn-primary">📅 Book Appointment</a>
+            <a href="{% url 'manage_rooms' %}" class="btn btn-secondary">🛏️ Allocate/Vacate Bed</a>
+            <a href="{% url 'ambulance_dispatch' %}" class="btn btn-primary" style="background-color: var(--primary-hover);">🚑 Dispatch Ambulance</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

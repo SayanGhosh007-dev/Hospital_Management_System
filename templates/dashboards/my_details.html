@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}My Patient Details{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>My Patient Profile</h3>
+    </div>
+    <div class="card-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <p><strong>Name:</strong> {{ patient.name }}</p>
+                <p><strong>Age:</strong> {{ patient.age }}</p>
+                <p><strong>Gender:</strong> {{ patient.gender }}</p>
+            </div>
+            <div>
+                <p><strong>Phone:</strong> {{ patient.phone }}</p>
+                <p><strong>Email:</strong> {{ patient.email|default:"N/A" }}</p>
+                <p><strong>Registration Date:</strong> {{ patient.created_at|date:"M d, Y" }}</p>
+            </div>
+        </div>
+        
+        <h4 style="margin-top: 30px;">Medical History</h4>
+        <div style="padding: 15px; border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: var(--bg-color); white-space: pre-line;">
+            {{ patient.medical_history|default:"No general medical history on file." }}
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <div class="card-header">
+        <h3>My Vitals History</h3>
+    </div>
+    <div class="card-body">
+        {% for v in vitals %}
+        <div style="padding: 10px; border: 1px solid {% if v.is_critical %}var(--danger-color){% else %}var(--border-color){% endif %}; border-radius: var(--border-radius); background-color: {% if v.is_critical %}#fff1f0{% else %}var(--bg-color){% endif %}; margin-bottom: 10px; font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; font-weight: bold; color: {% if v.is_critical %}var(--danger-color){% else %}var(--text-primary){% endif %};">
+                <span>Reading Status: {% if v.is_critical %}CRITICAL{% else %}Stable{% endif %}</span>
+                <small>{{ v.recorded_at|date:"M d H:i" }}</small>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; margin-top: 5px; color: var(--text-secondary);">
+                <div>Heart Rate: <b>{{ v.heart_rate }}</b> BPM</div>
+                <div>BP: <b>{{ v.systolic_bp }}/{{ v.diastolic_bp }}</b></div>
+                <div>Temp: <b>{{ v.temperature }}°F</b></div>
+                <div>Oxygen: <b>{{ v.oxygen_level }}%</b></div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+            No health monitoring data available.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

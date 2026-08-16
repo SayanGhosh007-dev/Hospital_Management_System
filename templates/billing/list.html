@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Invoice Ledger{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Medical Billing Ledger</h3>
+        <a href="{% url 'billing_create' %}" class="btn btn-primary">➕ Generate Invoice</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice ID</th>
+                        <th>Patient Name</th>
+                        <th>Consultation Fee</th>
+                        <th>Room Charges</th>
+                        <th>Medicine Charges</th>
+                        <th>Lab Charges</th>
+                        <th>Discount / Tax</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in bills %}
+                    <tr>
+                        <td>#INV-00{{ b.pk }}</td>
+                        <td><b>{{ b.patient.name }}</b></td>
+                        <td>${{ b.consultation_fee }}</td>
+                        <td>${{ b.room_charges }}</td>
+                        <td>${{ b.medicine_charges }}</td>
+                        <td>${{ b.lab_charges }}</td>
+                        <td>{{ b.discount }}% / 18%</td>
+                        <td><b>${{ b.get_total }}</b></td>
+                        <td>
+                            {% if b.status == 'Paid' %}
+                                <span class="role-badge" style="background-color: #d9f7be; color: #389e0d;">Paid</span>
+                            {% elif b.status == 'Pending' %}
+                                <span class="role-badge" style="background-color: #fff1f0; color: #ff4d4f;">Pending</span>
+                            {% else %}
+                                <span class="role-badge" style="background-color: #fffbe6; color: #d46b08;">{{ b.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: var(--text-secondary);">No medical billing records.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: var(--primary-light);">
+                        <td colspan="7" style="text-align: right; font-size: 1.1rem;"><b>Overall Grand Total:</b></td>
+                        <td colspan="2" style="font-size: 1.1rem; color: var(--primary-color);"><b>${{ grand_total|floatformat:2 }}</b></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Ventilation Sessions{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>ICU Digital Ventilation Sessions</h3>
+        {% if user.profile.role == 'Admin' or user.profile.role == 'Doctor' or user.profile.role == 'Nurse' %}
+        <a href="{% url 'ventilator_create' %}" class="btn btn-primary">➕ Start Ventilation</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ventilator ID</th>
+                        <th>Patient</th>
+                        <th>Ventilation Mode</th>
+                        <th>Safety Status</th>
+                        <th>Started At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in sessions %}
+                    <tr>
+                        <td><b>{{ session.ventilator.device_id }}</b></td>
+                        <td>{{ session.patient.name }}</td>
+                        <td><span class="role-badge" style="background-color: var(--primary-light); color: var(--primary-color);">{{ session.mode }}</span></td>
+                        <td>
+                            <span style="font-weight: bold; color: {% if 'Alert' in session.check_status %}var(--danger-color){% else %}var(--success-color){% endif %};">
+                                {{ session.check_status }}
+                            </span>
+                        </td>
+                        <td>{{ session.start_time|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            <a href="{% url 'ventilator_detail' session.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;">Clinical Details</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-secondary);">No ventilator allocation sessions currently running.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Nurse Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Occupied Beds</h3>
+            <p>{{ allocated_rooms.count }}</p>
+        </div>
+        <div class="stat-icon">🛏️</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Active Ventilators</h3>
+            <p>{{ active_ventilators.count }}</p>
+        </div>
+        <div class="stat-icon">🫁</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Critical Readings</h3>
+            <p style="color: var(--danger-color);">{{ critical_vitals|length }}</p>
+        </div>
+        <div class="stat-icon">⚠️</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+    <!-- ICU Ventilators -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Active Ventilation Sessions</h3>
+            <a href="{% url 'ventilator_sessions' %}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">All Sessions</a>
+        </div>
+        <div class="card-body">
+            {% for session in active_ventilators %}
+            <div style="padding: 15px; border: 1px solid var(--border-color); border-radius: var(--border-radius); margin-bottom: 15px; background-color: var(--bg-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4>{{ session.ventilator.device_id }} ➔ {{ session.patient.name }}</h4>
+                    <span class="role-badge" style="background-color: var(--primary-light); color: var(--primary-color);">{{ session.mode }}</span>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary); display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                    <div>FiO2: <b>{{ session.oxygen_level }}%</b></div>
+                    <div>Rate: <b>{{ session.respiratory_rate }} BPM</b></div>
+                    <div>PEEP: <b>{{ session.peep }} cmH2O</b></div>
+                    <div>Status: <b style="color: {% if 'Alert' in session.check_status %}var(--danger-color){% else %}var(--success-color){% endif %};">{{ session.check_status }}</b></div>
+                </div>
+                <div style="margin-top: 10px; text-align: right;">
+                    <a href="{% url 'ventilator_detail' session.pk %}" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;">Adjust Telemetry</a>
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align: center; color: var(--text-secondary); padding: 30px;">
+                No patient is currently on ventilation.
+            </div>
+            {% endfor %}
+            <a href="{% url 'ventilator_create' %}" class="btn btn-primary" style="width: 100%;">➕ Start Ventilation Session</a>
+        </div>
+    </div>
+
+    <!-- Critical Vital Alerts -->
+    <div class="card">
+        <div class="card-header">
+            <h3 style="color: var(--danger-color);">⚠️ Triage Vital Flags</h3>
+        </div>
+        <div class="card-body">
+            {% for v in critical_vitals %}
+            <div style="padding: 12px; border: 1px solid var(--danger-color); border-radius: var(--border-radius); background-color: #fff1f0; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h5 style="color: var(--danger-color); font-size: 1rem;"><a href="{% url 'patient_detail' v.patient.pk %}">{{ v.patient.name }}</a></h5>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">{{ v.critical_factors }}</p>
+                </div>
+                <small style="color: var(--text-secondary);">{{ v.recorded_at|date:"H:i" }}</small>
+            </div>
+            {% empty %}
+            <div style="text-align: center; color: var(--text-secondary); padding: 30px;">
+                All monitored patients have stable vitals.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

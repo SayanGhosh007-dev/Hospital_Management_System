@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HMS{% endblock %} - SafeLife Hospital</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=1.1">
+    <script>
+        // Set theme immediately to avoid flash of light mode in Chrome
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        } catch(e) {}
+    </script>
+</head>
+<body data-theme="light">
+    <script>
+        try {
+            document.body.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+        } catch(e) {}
+    </script>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        {% if user.is_authenticated %}
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="hospital-logo">✚</div>
+                <h2>SafeLife HMS</h2>
+            </div>
+            <ul class="sidebar-menu">
+                {% if user.profile.role != 'Patient' %}
+                <li><a href="{% url 'dashboard_redirect' %}">📊 Dashboard</a></li>
+                {% endif %}
+                
+                <!-- Role-Based Navigation items -->
+                {% if user.profile.role == 'Admin' %}
+                    <li><a href="{% url 'pending_requests' %}">🔔 Pending Registrations</a></li>
+                    <li><a href="{% url 'patient_list' %}">👥 Patients</a></li>
+                    <li><a href="{% url 'manage_rooms' %}">🛏️ Rooms & Beds</a></li>
+                    <li><a href="{% url 'manage_pricing' %}">💲 Room Pricing</a></li>
+                    <li><a href="{% url 'ventilator_sessions' %}">🫁 Ventilators</a></li>
+                    <li><a href="{% url 'billing_list' %}">💵 Invoicing & Bills</a></li>
+                    <li><a href="{% url 'inventory_list' %}">💊 Pharmacy Inventory</a></li>
+                    <li><a href="{% url 'ambulance_dispatch' %}">🚑 Ambulance Radar</a></li>
+                {% endif %}
+
+                {% if user.profile.role == 'Doctor' %}
+                    <li><a href="{% url 'patient_list' %}">👥 Patients</a></li>
+                    <li><a href="{% url 'ventilator_sessions' %}">🫁 Ventilator sessions</a></li>
+                    <li><a href="{% url 'trigger_emergency' %}">🚨 Code Blue</a></li>
+                {% endif %}
+
+                {% if user.profile.role == 'Nurse' %}
+                    <li><a href="{% url 'patient_list' %}">👥 Patients</a></li>
+                    <li><a href="{% url 'manage_rooms' %}">🛏️ Wards & Beds</a></li>
+                    <li><a href="{% url 'ventilator_sessions' %}">🫁 Ventilator monitor</a></li>
+                {% endif %}
+
+                {% if user.profile.role == 'Receptionist' %}
+                    <li><a href="{% url 'patient_list' %}">👥 Register Patient</a></li>
+                    <li><a href="{% url 'appointment_book' %}">📅 Book Appointment</a></li>
+                    <li><a href="{% url 'manage_rooms' %}">🛏️ Bed occupancy</a></li>
+                    <li><a href="{% url 'ambulance_dispatch' %}">🚑 Dispatch Ambulance</a></li>
+                {% endif %}
+
+                {% if user.profile.role == 'Pharmacist' %}
+                    <li><a href="{% url 'inventory_list' %}">💊 Dispense & Stock</a></li>
+                {% endif %}
+
+                {% if user.profile.role == 'LabStaff' %}
+                    <li><a href="{% url 'patient_list' %}">👥 Patients</a></li>
+                {% endif %}
+                
+                {% if user.profile.role == 'Accountant' %}
+                    <li><a href="{% url 'billing_list' %}">💵 Financial Bills</a></li>
+                {% endif %}
+                
+                {% if user.profile.role == 'Patient' %}
+                    <li><a href="{% url 'patient_dashboard' %}">🏠 My Dashboard</a></li>
+                    <li><a href="{% url 'patient_my_details' %}">👤 My Patient Details</a></li>
+                    <li><a href="{% url 'patient_my_prescriptions' %}">💊 My Prescriptions</a></li>
+                {% endif %}
+                
+                {% if user.profile.role != 'Patient' %}
+                <li><a href="{% url 'punch_attendance' %}">⏰ Punch Attendance</a></li>
+                {% endif %}
+                <li><a href="{% url 'profile' %}">👤 My Profile</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="{% url 'logout' %}" style="color: var(--danger-color); font-weight: bold;">🚪 Logout</a>
+            </div>
+        </aside>
+        {% endif %}
+
+        <!-- Main Wrapper -->
+        <main class="main-content">
+            {% if user.is_authenticated %}
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+                    <h2>Welcome, {{ user.first_name|default:user.username }}</h2>
+                </div>
+                <div class="navbar-right">
+                    <span class="role-badge role-{{ user.profile.role|lower }}">{{ user.profile.role }}</span>
+                </div>
+            </nav>
+            {% endif %}
+
+            <!-- Message alerts -->
+            <div class="content-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <button class="floating-theme-btn" id="theme-btn" title="Toggle Dark/Light Mode">🌙</button>
+    <script src="{% static 'js/main.js' %}?v=1.1"></script>
+</body>
+</html>

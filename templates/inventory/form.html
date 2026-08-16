@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div style="max-width: 700px; margin: 40px auto; padding: 30px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: 0 4px 6px var(--shadow-color);">
+    <h3>{{ title }}</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">Adjust stock quantities, pricing parameters, or batch expiry details.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+                <div style="color: var(--danger-color); font-size: 0.85rem; margin-top: 5px;">{{ field.errors|join:", " }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+            <a href="{% url 'inventory_list' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Item</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    form input, form select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+        font-size: 1rem;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}

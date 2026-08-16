@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Accountant Finance{% endblock %}
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card" style="border-left: 5px solid var(--success-color);">
+        <div class="stat-info">
+            <h3>Total Revenue Paid</h3>
+            <p>${{ total_revenue }}</p>
+        </div>
+        <div class="stat-icon">💵</div>
+    </div>
+    <div class="stat-card" style="border-left: 5px solid var(--danger-color);">
+        <div class="stat-info">
+            <h3>Pending Revenue</h3>
+            <p>${{ pending_payments }}</p>
+        </div>
+        <div class="stat-icon">⏰</div>
+    </div>
+    <div class="stat-card" style="border-left: 5px solid var(--warning-color);">
+        <div class="stat-info">
+            <h3>Partially Paid</h3>
+            <p>${{ partially_paid }}</p>
+        </div>
+        <div class="stat-icon">⚖️</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Billing Ledger & Outstanding Invoices</h3>
+        <a href="{% url 'billing_create' %}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">➕ Create Invoice</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice ID</th>
+                        <th>Patient Name</th>
+                        <th>Subtotal Charges</th>
+                        <th>Tax (%)</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in bills %}
+                    <tr>
+                        <td>#INV-00{{ b.pk }}</td>
+                        <td><b>{{ b.patient.name }}</b></td>
+                        <td>${{ b.consultation_fee }}</td>
+                        <td>{{ b.tax }}%</td>
+                        <td><b>${{ b.get_total }}</b></td>
+                        <td>
+                            {% if b.status == 'Paid' %}
+                                <span class="role-badge" style="background-color: #d9f7be; color: #389e0d;">Paid</span>
+                            {% elif b.status == 'Pending' %}
+                                <span class="role-badge" style="background-color: #fff1f0; color: #ff4d4f;">Unpaid</span>
+                            {% else %}
+                                <span class="role-badge" style="background-color: #fffbe6; color: #d46b08;">{{ b.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-secondary);">No invoices logged.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

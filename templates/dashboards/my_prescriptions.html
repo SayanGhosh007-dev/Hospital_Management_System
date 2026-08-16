@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}My Prescriptions{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>My Diagnostic Notes & Prescriptions</h3>
+    </div>
+    <div class="card-body">
+        {% for record in emr_records %}
+        <div style="padding: 15px; border: 1px solid var(--border-color); border-radius: var(--border-radius); margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h5 style="color: var(--primary-color);">Diagnosis: {{ record.diagnosis }}</h5>
+                <small style="color: var(--text-secondary);">{{ record.created_at|date:"M d, Y" }}</small>
+            </div>
+            
+            <p style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 10px;">
+                <b>Treatment Protocol:</b> {{ record.treatment }}
+            </p>
+            
+            <div style="background-color: var(--bg-color); padding: 15px; border-radius: var(--border-radius); border-left: 4px solid var(--primary-color);">
+                <h5 style="margin-bottom: 5px; color: var(--text-primary);">💊 Prescriptions:</h5>
+                {% if record.prescriptions %}
+                    <p style="font-size: 0.95rem; color: var(--text-secondary); white-space: pre-line;">{{ record.prescriptions }}</p>
+                {% else %}
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">No medications prescribed.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+            No clinical diagnosis or prescription logs are available on your account.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

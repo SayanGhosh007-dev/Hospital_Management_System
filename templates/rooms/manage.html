@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Bed Occupancy Wards{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>Room & Bed Allocation Management</h3>
+        {% if user.profile.role == 'Admin' or user.profile.role == 'Receptionist' %}
+        <a href="{% url 'room_create' %}" class="btn btn-primary">➕ Add New Room</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div style="margin-bottom: 20px;">
+            <strong>Filter by Room Type: </strong>
+            <a href="{% url 'manage_rooms' %}" class="btn {% if selected_type == 'All' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 5px 10px; margin-right: 5px;">All</a>
+            {% for type in room_types %}
+                <a href="?room_type={{ type }}" class="btn {% if selected_type == type %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 5px 10px; margin-right: 5px;">{{ type }}</a>
+            {% endfor %}
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+            {% for r in rooms %}
+            <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 20px; background-color: var(--surface-color); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="color: var(--primary-color);">Room {{ r.room_number }} <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary);">(Floor {{ r.room_number|stringformat:"s"|make_list|first }})</span></h4>
+                        <span class="role-badge" style="background-color: var(--primary-light); color: var(--primary-color);">
+                            {{ r.room_type }}{% if r.room_type == 'Private' and r.private_category %} ({{ r.private_category }}){% endif %}
+                        </span>
+                    </div>
+                    <div style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-secondary);">
+                        Daily Rate: <b>${{ r.charges }}</b> | Status: <b>{{ r.status }}</b>
+                    </div>
+
+                    <!-- Beds Listing inside Room -->
+                    <div style="margin: 15px 0; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h5>Beds Status:</h5>
+                            {% if r.sorted_beds|length > 2 %}
+                            <button onclick="toggleBeds({{ r.pk }})" id="btn-toggle-{{ r.pk }}" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--border-color); background: var(--bg-color);">Show Beds ▼</button>
+                            {% endif %}
+                        </div>
+                        
+                        <div id="beds-container-{{ r.pk }}" {% if r.sorted_beds|length > 2 %}style="display: none;"{% endif %}>
+                            {% for bed in r.sorted_beds %}
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 8px; font-size: 0.85rem; background-color: var(--bg-color);">
+                            <div>
+                                🛏️ Bed <b>{{ bed.bed_number }}</b> [<i>{{ bed.category }}</i>]
+                                {% if bed.patient %}
+                                    - <small style="color: var(--text-secondary);">{{ bed.patient.name }}</small>
+                                    {% if bed.medical_case %}
+                                    <div style="margin-left: 20px; font-size: 0.75rem; color: var(--danger-color); font-style: italic;">
+                                        Case: {{ bed.medical_case }}
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                <span class="role-badge" style="font-size:0.7rem; padding: 2px 6px; {% if bed.patient or bed.status != 'Available' %}background-color: #fff1f0; color: #ff4d4f;{% else %}background-color: #d9f7be; color: #389e0d;{% endif %}">{% if bed.patient %}Occupied{% else %}{{ bed.status }}{% endif %}</span>
+                                {% if user.profile.role == 'Admin' or user.profile.role == 'Receptionist' or user.profile.role == 'Nurse' %}
+                                    <a href="{% url 'bed_allocate' bed.pk %}" style="font-size: 0.8rem; color: var(--primary-color);">Assign</a>
+                                {% endif %}
+                                {% if user.profile.role == 'Admin' or user.profile.role == 'Receptionist' %}
+                                    <a href="{% url 'bed_update' bed.pk %}" style="font-size: 0.8rem; color: var(--secondary-color); margin-left: 5px;">Edit</a>
+                                    <a href="{% url 'bed_delete' bed.pk %}" style="font-size: 0.8rem; color: var(--danger-color); margin-left: 5px;">❌</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); italic;">No beds added yet.</p>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px; display: flex; gap: 8px;">
+                    {% if user.profile.role == 'Admin' or user.profile.role == 'Receptionist' %}
+                    <a href="{% url 'bed_create' r.pk %}" class="btn btn-secondary" style="flex: 1; text-align: center; font-size: 0.8rem; padding: 6px;">➕ Add Bed</a>
+                    <a href="{% url 'room_update' r.pk %}" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">Edit Room</a>
+                    <a href="{% url 'room_delete' r.pk %}" class="btn btn-primary" style="background-color: var(--danger-color); font-size: 0.8rem; padding: 6px 12px;">Remove</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: var(--text-secondary); width: 100%;">No rooms defined in the system.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<script>
+    function toggleBeds(roomId) {
+        var container = document.getElementById('beds-container-' + roomId);
+        var btn = document.getElementById('btn-toggle-' + roomId);
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            btn.innerHTML = 'Hide Beds ▲';
+        } else {
+            container.style.display = 'none';
+            btn.innerHTML = 'Show Beds ▼';
+        }
+    }
+</script>
+{% endblock %}

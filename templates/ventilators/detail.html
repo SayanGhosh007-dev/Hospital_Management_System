@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Ventilation Session Detail{% endblock %}
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    <!-- Telemetry status -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Ventilation Telemetry Metrics</h3>
+            </div>
+            <div class="card-body">
+                <div style="padding: 15px; border-radius: var(--border-radius); border: 1px solid {% if 'Alert' in session.check_status %}var(--danger-color){% else %}var(--success-color){% endif %}; background-color: {% if 'Alert' in session.check_status %}#fff1f0{% else %}#f6ffed{% endif %}; margin-bottom: 20px;">
+                    <h4>System Check Status</h4>
+                    <p style="font-size: 1.1rem; font-weight: bold; margin-top: 5px; color: {% if 'Alert' in session.check_status %}var(--danger-color){% else %}var(--success-color){% endif %};">
+                        {{ session.check_status }}
+                    </p>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Patient Name</span>
+                        <b>{{ session.patient.name }}</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Ventilator Unit</span>
+                        <b>{{ session.ventilator.device_id }}</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Ventilation Mode</span>
+                        <b>{{ session.mode }}</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>FiO2 (Oxygen Level)</span>
+                        <b>{{ session.oxygen_level }} %</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Respiratory Rate</span>
+                        <b>{{ session.respiratory_rate }} BPM</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Tidal Volume</span>
+                        <b>{{ session.tidal_volume }} mL</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>PEEP Pressure</span>
+                        <b>{{ session.peep }} cmH2O</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Airway Pressures (Peak / Plat)</span>
+                        <b>{{ session.peak_pressure }} / {{ session.plateau_pressure }} cmH2O</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update telemetry form -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Adjust Ventilator Settings</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label style="font-size: 0.85rem;">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div style="color: var(--danger-color); font-size: 0.8rem;">{{ field.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Update Parameters</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    form input, form select {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}

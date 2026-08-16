@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; padding: 30px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: 0 4px 6px var(--shadow-color);">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-light); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 10px;">
+            👤
+        </div>
+        <h2>{{ profile.user.get_full_name|default:profile.user.username }}</h2>
+        <span class="role-badge role-{{ role|lower }}">{{ role }}</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 15px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+        <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Username</span>
+            <b>{{ profile.user.username }}</b>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Email Address</span>
+            <b>{{ profile.user.email }}</b>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Contact Number</span>
+            <b>{{ profile.phone|default:"N/A" }}</b>
+        </div>
+
+        {% if role == 'Doctor' %}
+        <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Specialization</span>
+            <b>{{ doctor_profile.specialization }}</b>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Department</span>
+            <b>{{ doctor_profile.department.name|default:"General" }}</b>
+        </div>
+        {% elif role == 'Nurse' %}
+        <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Duty Department</span>
+            <b>{{ nurse_profile.department.name|default:"General" }}</b>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

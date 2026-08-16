@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Laboratory Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Pending Lab Tests</h3>
+            <p>{{ pending_tests.count }} Requests</p>
+        </div>
+        <div class="stat-icon">🧪</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>Completed Today</h3>
+            <p>{{ completed_tests.count }} Tests</p>
+        </div>
+        <div class="stat-icon">✅</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 30px;">
+    <!-- Pending Requests -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Pending Diagnostics Queue</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Test Name</th>
+                            <th>Requested By</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for test in pending_tests %}
+                        <tr>
+                            <td>{{ test.patient.name }}</td>
+                            <td><b>{{ test.test_name }}</b></td>
+                            <td>{{ test.requested_by|default:"Emergency Department" }}</td>
+                            <td><span class="role-badge" style="background-color: var(--warning-color); color: black;">{{ test.status }}</span></td>
+                            <td>
+                                <a href="{% url 'lab_test_update' test.pk %}" class="btn btn-primary" style="padding: 4px 8px; font-size: 0.8rem;">Enter Results</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-secondary);">No pending laboratory requests.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completed History -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Completed Reports</h3>
+        </div>
+        <div class="card-body">
+            {% for test in completed_tests %}
+            <div style="padding: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 10px;">
+                <h5 style="color: var(--primary-color);">{{ test.test_name }}</h5>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Patient: {{ test.patient.name }}</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">Result: {{ test.result_details|truncatewords:8 }}</p>
+            </div>
+            {% empty %}
+            <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                No test reports completed yet.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

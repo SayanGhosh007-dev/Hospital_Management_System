@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Pharmacy Inventory{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Medical Consumables & Pharmacy Inventory</h3>
+        {% if user.profile.role == 'Admin' or user.profile.role == 'Pharmacist' %}
+        <a href="{% url 'inventory_create' %}" class="btn btn-primary">➕ Add Stock Item</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Medicine / Item Name</th>
+                        <th>Category</th>
+                        <th>Stock Level</th>
+                        <th>Unit Price</th>
+                        <th>Batch Number</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr {% if item.is_out_of_stock %}style="background-color: rgba(255, 77, 79, 0.15);"{% elif item.is_low_stock %}style="background-color: rgba(212, 107, 8, 0.15);"{% endif %}>
+                        <td><b>{{ item.item_name }}</b></td>
+                        <td>{{ item.category }}</td>
+                        <td><b>{{ item.quantity }}</b> units</td>
+                        <td>${{ item.price }}</td>
+                        <td>{{ item.batch_number }}</td>
+                        <td>{{ item.expiry_date }}</td>
+                        <td>
+                            {% if item.is_out_of_stock %}
+                                <span class="role-badge" style="background-color: #ffccc7; color: #ff4d4f;">Out of Stock</span>
+                            {% elif item.is_low_stock %}
+                                <span class="role-badge" style="background-color: #ffe58f; color: #d46b08;">Low Stock</span>
+                            {% else %}
+                                <span class="role-badge" style="background-color: #d9f7be; color: #389e0d;">In Stock</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.profile.role == 'Admin' or user.profile.role == 'Pharmacist' %}
+                            <div style="display: flex; gap: 5px;">
+                                <a href="{% url 'inventory_update' item.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;">Update</a>
+                                <a href="{% url 'inventory_delete' item.pk %}" class="btn btn-primary" style="background-color: var(--danger-color); padding: 4px 8px; font-size: 0.8rem;">Delete</a>
+                            </div>
+                            {% else %}
+                            <span style="color: var(--text-secondary);">Read Only</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-secondary);">No medicine inventory records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

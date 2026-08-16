@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Ambulance Dispatch Radar{% endblock %}
+{% block content %}
+<div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+    <!-- Active Fleet status -->
+    <div>
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Fleet Telemetry Radar Status</h3>
+                {% if user.profile.role == 'Admin' or user.profile.role == 'Receptionist' %}
+                <a href="{% url 'ambulance_create' %}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">➕ Add Ambulance</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Unit Number</th>
+                                <th>Driver Contact</th>
+                                <th>Current Location</th>
+                                <th>Trip Count</th>
+                                <th>Status</th>
+                                {% if user.profile.role == 'Admin' %}<th>Action</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for amb in ambulances %}
+                            <tr>
+                                <td><b>{{ amb.ambulance_number }}</b></td>
+                                <td>{{ amb.driver_name }}<br><small>{{ amb.driver_contact }}</small></td>
+                                <td>
+                                    {{ amb.current_location }}
+                                    {% if amb.destination %}
+                                        ➔ <b>{{ amb.destination }}</b>
+                                    {% endif %}
+                                </td>
+                                <td>{{ amb.patient_count }} cases</td>
+                                <td>
+                                    {% if amb.status == 'Available' %}
+                                        <span class="role-badge" style="background-color: #d9f7be; color: #389e0d;">Available</span>
+                                    {% elif amb.status == 'Maintenance' %}
+                                        <span class="role-badge" style="background-color: #fff1f0; color: #ff4d4f;">Maintenance</span>
+                                    {% else %}
+                                        <span class="role-badge" style="background-color: #ffe58f; color: #d46b08;">Assigned</span>
+                                    {% endif %}
+                                </td>
+                                {% if user.profile.role == 'Admin' %}
+                                <td>
+                                    <a href="{% url 'ambulance_delete' amb.pk %}" class="btn btn-primary" style="background-color: var(--danger-color); padding: 4px 10px; font-size: 0.8rem;">Remove</a>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-secondary);">No fleet vehicles tracked.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dispatch control panel -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Ambulance Dispatch Control</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Select Available Unit</label>
+                        <select name="ambulance_id" class="form-control" required>
+                            {% for amb in ambulances %}
+                                {% if amb.status == 'Available' %}
+                                    <option value="{{ amb.pk }}">{{ amb.ambulance_number }} (Driver: {{ amb.driver_name }})</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dispatch Destination</label>
+                        <input type="text" name="destination" class="form-control" placeholder="e.g. 5th Avenue block accident site" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Dispatch Unit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    form select, form input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+        font-size: 1rem;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
