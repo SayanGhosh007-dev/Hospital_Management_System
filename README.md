@@ -32,7 +32,7 @@ The system provides highly specialized dashboards and permissions for 8 distinct
 
 ## 🛠️ Technology Stack
 - **Backend**: Python, Django
-- **Database**: SQLite (Development)
+- **Database**: MYSQL (Development)
 - **Frontend**: HTML5, CSS3 (Vanilla), JavaScript, Django Templates
 - **Architecture**: MVT (Model-View-Template)
 
